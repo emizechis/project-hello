@@ -1,0 +1,7 @@
+import {useState} from "react";
+import {createFileRoute,useNavigate} from "@tanstack/react-router";
+import {joinCampaign} from "@/features/campaigns/api";
+import {GlassCard} from "@/features/core/ui/GlassCard";
+import {NeonButton} from "@/features/core/ui/NeonButton";
+export const Route=createFileRoute("/campaigns/join")({component:JoinCampaign});
+function JoinCampaign(){const nav=useNavigate();const [code,setCode]=useState("");const [error,setError]=useState("");return <main className="min-h-screen grid place-items-center bg-[#070b14] px-6 text-slate-100"><GlassCard className="w-full max-w-md p-8"><p className="text-xs uppercase tracking-[.3em] text-violet-300">NEXUS / CONVITE</p><h1 className="mt-3 text-3xl font-bold">Entrar em campanha</h1><p className="mt-2 text-sm text-slate-500">Cole o código recebido pelo mestre.</p><form className="mt-7 space-y-4" onSubmit={async e=>{e.preventDefault();try{await joinCampaign(code.trim());nav({to:"/campaigns"})}catch(x){setError(x instanceof Error?x.message:"Convite inválido.")}}}><input required value={code} onChange={e=>setCode(e.target.value)} placeholder="Código de convite" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 font-mono"/>{error&&<p className="text-sm text-red-300">{error}</p>}<NeonButton type="submit" className="w-full">Entrar</NeonButton></form></GlassCard></main>}
