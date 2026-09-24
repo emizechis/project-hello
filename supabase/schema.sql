@@ -87,3 +87,5 @@ alter table public.characters add column if not exists skills jsonb not null def
 alter table public.characters add column if not exists inventory jsonb not null default '[]'::jsonb;
 alter table public.characters add column if not exists weapons jsonb not null default '[]'::jsonb;
 alter table public.characters add column if not exists conditions jsonb not null default '[]'::jsonb;
+
+create policy "session logs insert" on public.session_logs for insert with check (exists (select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=auth.uid()));
