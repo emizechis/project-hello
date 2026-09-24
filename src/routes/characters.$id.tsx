@@ -13,9 +13,10 @@ import {InventoryPanel,type InventoryItem} from "@/features/sheet/InventoryPanel
 import {WeaponPanel} from "@/features/sheet/WeaponPanel";
 import type {Weapon} from "@/features/sheet/weapons";
 import {ConditionsPanel} from "@/features/sheet/ConditionsPanel";
+import {RitualPanel} from "@/features/sheet/RitualPanel";
 export const Route=createFileRoute("/characters/$id")({component:CharacterEditor});
-function CharacterEditor(){const {id}=Route.useParams();const nav=useNavigate();const [character,setCharacter]=useState<Character|null>(null);const [error,setError]=useState("");const [saving,setSaving]=useState(false); const [skills,setSkills]=useState<Skill[]>([]); const [inventory,setInventory]=useState<InventoryItem[]>([]); const [weapons,setWeapons]=useState<Weapon[]>([]);
-useEffect(()=>{listCharacters().then(xs=>{const c=xs.find(x=>x.id===id)||null;setCharacter(c);if(c){setSkills((c.skills||[]) as Skill[]);setInventory((c.inventory||[]) as InventoryItem[]);setWeapons((c.weapons||[]) as Weapon[])}}).catch(e=>setError(e instanceof Error?e.message:"Erro ao carregar."))},[id]);
+function CharacterEditor(){const {id}=Route.useParams();const nav=useNavigate();const [character,setCharacter]=useState<Character|null>(null);const [error,setError]=useState("");const [saving,setSaving]=useState(false); const [skills,setSkills]=useState<Skill[]>([]); const [inventory,setInventory]=useState<InventoryItem[]>([]); const [weapons,setWeapons]=useState<Weapon[]>([]); const [conditions,setConditions]=useState<string[]>([]);
+useEffect(()=>{listCharacters().then(xs=>{const c=xs.find(x=>x.id===id)||null;setCharacter(c);if(c){setSkills((c.skills||[]) as Skill[]);setInventory((c.inventory||[]) as InventoryItem[]);setWeapons((c.weapons||[]) as Weapon[]);setConditions(c.conditions||[])}}).catch(e=>setError(e instanceof Error?e.message:"Erro ao carregar."))},[id]);
 if(error)return <main className="min-h-screen bg-[#070b14] p-10 text-red-300">{error}</main>;
 if(!character)return <main className="min-h-screen bg-[#070b14] p-10 text-slate-500">Carregando ficha...</main>;
 const attrs=character.attributes||Object.fromEntries(ATTRIBUTES.map(a=>[a,1]));const stats=derived(attrs,character.nex||5);
@@ -30,6 +31,7 @@ return <main className="min-h-screen bg-[#070b14] px-6 py-10 text-slate-100"><di
 <GlassCard className="p-6"><h2 className="mb-5 text-lg font-semibold">Perícias</h2><SkillPanel values={skills} onChange={v=>{setSkills(v);void persistModules(v,inventory,weapons)}} modifiers={skillModifiers}/></GlassCard>
 <GlassCard className="p-6"><h2 className="mb-5 text-lg font-semibold">Inventário</h2><InventoryPanel items={inventory} onChange={v=>{setInventory(v);void persistModules(skills,v,weapons)}}/></GlassCard>
 <GlassCard className="p-6"><h2 className="mb-5 text-lg font-semibold">Armas</h2><WeaponPanel items={weapons} onChange={v=>{setWeapons(v);void persistModules(skills,inventory,v)}}/></GlassCard>
-<GlassCard className="p-6"><h2 className="mb-5 text-lg font-semibold">Condições</h2><ConditionsPanel/></GlassCard>
+<GlassCard className="p-6"><h2 className="mb-5 text-lg font-semibold">Condições</h2><ConditionsPanel value={conditions} onChange={v=>{setConditions(v);void persistModules(skills,inventory,weapons,v)}}/></GlassCard>
+<GlassCard className="p-6"><h2 className="mb-5 text-lg font-semibold">Rituais</h2><RitualPanel/></GlassCard>
 <GlassCard className="p-6"><h2 className="mb-5 text-lg font-semibold">Dados da ficha</h2><CharacterForm initial={character} submitLabel="Salvar ficha" onSubmit={async data=>patch(data)}/></GlassCard></div>
 <aside className="space-y-5"><GlassCard className="p-6"><h2 className="text-lg font-semibold">Resumo</h2><div className="mt-5 space-y-3 text-sm"><p><span className="text-slate-500">Classe</span><br/>{character.class_name||"—"}</p><p><span className="text-slate-500">Origem</span><br/>{character.origin||"—"}</p><p><span className="text-slate-500">NEX</span><br/>{character.nex}%</p><p><span className="text-slate-500">Idade</span><br/>{character.age||"—"}</p></div></GlassCard><GlassCard className="p-6"><h2 className="text-lg font-semibold">Próximo módulo</h2><p className="mt-2 text-sm text-slate-500">Perícias, inventário, armas, rituais e condições serão adicionados à ficha.</p></GlassCard></aside></div></div></main>}
