@@ -1,0 +1,8 @@
+import {useEffect,useState} from "react";
+import {createFileRoute,Link} from "@tanstack/react-router";
+import {listCampaigns,deleteCampaign,type Campaign} from "@/features/campaigns/api";
+import {GlassCard} from "@/features/core/ui/GlassCard";
+import {NeonButton} from "@/features/core/ui/NeonButton";
+import {CampaignCard} from "@/features/campaigns/CampaignCard";
+export const Route=createFileRoute("/campaigns")({component:Campaigns});
+function Campaigns(){const [items,setItems]=useState<Campaign[]>([]);const [error,setError]=useState("");const load=()=>listCampaigns().then(setItems).catch(e=>setError(e instanceof Error?e.message:"Erro ao carregar."));useEffect(()=>{load()},[]);return <main className="min-h-screen bg-[#070b14] px-6 py-10 text-slate-100"><div className="mx-auto max-w-6xl"><div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs uppercase tracking-[.3em] text-violet-300">NEXUS / CAMPANHAS</p><h1 className="mt-2 text-4xl font-bold">Suas campanhas</h1><p className="mt-2 text-slate-500">Crie mesas, organize jogadores e mantenha as sessões conectadas.</p></div><Link to="/campaigns/new"><NeonButton>Nova campanha</NeonButton></Link></div>{error&&<p className="mt-8 text-sm text-red-300">{error}</p>}<div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map(c=><CampaignCard key={c.id} campaign={c} onDelete={async()=>{if(confirm("Excluir campanha?")){await deleteCampaign(c.id);load()}}}/>)}</div>{!items.length&&!error&&<GlassCard className="mt-10 p-10 text-center text-slate-500">Nenhuma campanha criada ainda.</GlassCard>}</div></main>}
