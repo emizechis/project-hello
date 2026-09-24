@@ -1,0 +1,11 @@
+import {useEffect,useState} from "react";
+import {createFileRoute,Link} from "@tanstack/react-router";
+import {GlassCard} from "@/features/core/ui/GlassCard";
+import {NeonButton} from "@/features/core/ui/NeonButton";
+import {CharacterCard} from "@/features/characters/CharacterCard";
+import {deleteCharacter,duplicateCharacter,listCharacters,type Character} from "@/features/characters/api";
+import {getSession} from "@/lib/session";
+export const Route=createFileRoute("/characters")({component:Characters});
+function Characters(){const [items,setItems]=useState<Character[]>([]);const [loading,setLoading]=useState(true);const [error,setError]=useState("");const token=getSession()?.access_token;
+async function load(){if(!token){setLoading(false);return}try{setItems(await listCharacters(token) as Character[])}catch(e){setError(e instanceof Error?e.message:"Não foi possível carregar.")}finally{setLoading(false)}}useEffect(()=>{load()},[]);
+return <main className="min-h-screen bg-[#070b14] px-6 py-10 text-slate-100"><div className="mx-auto max-w-6xl"><div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs uppercase tracking-[.3em] text-sky-300">NEXUS / PERSONAGENS</p><h1 className="mt-2 text-4xl font-bold">Seus personagens</h1><p className="mt-2 text-slate-500">Crie, edite e mantenha suas fichas sincronizadas.</p></div><Link to="/characters/new"><NeonButton>Novo personagem</NeonButton></Link></div>{error&&<p className="mt-8 rounded-xl border border-red-400/20 bg-red-400/5 p-4 text-sm text-red-300">{error}</p>}{loading?<p className="mt-10 text-slate-500">Carregando...</p>:items.length===0?<GlassCard className="mt-10 p-10 text-center"><h2 className="text-xl font-semibold">Nenhum personagem ainda</h2><p className="mt-2 text-sm text-slate-500">Sua próxima ficha começa aqui.</p><Link to="/characters/new" className="mt-5 inline-block text-sm text-sky-300">Criar personagem →</Link></GlassCard>:<div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map(c=><CharacterCard key={c.id} character={c} onDelete={async()=>{if(confirm("Excluir este personagem?")){await deleteCharacter(c.id,token);load()}}} onDuplicate={async()=>{await duplicateCharacter(c,token);load()}}/>)}</div>}</div></main>}
