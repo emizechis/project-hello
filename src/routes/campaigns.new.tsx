@@ -1,0 +1,7 @@
+import {useState} from "react";
+import {createFileRoute,useNavigate} from "@tanstack/react-router";
+import {createCampaign} from "@/features/campaigns/api";
+import {GlassCard} from "@/features/core/ui/GlassCard";
+import {NeonButton} from "@/features/core/ui/NeonButton";
+export const Route=createFileRoute("/campaigns/new")({component:NewCampaign});
+function NewCampaign(){const nav=useNavigate();const [name,setName]=useState("");const [description,setDescription]=useState("");const [error,setError]=useState("");return <main className="min-h-screen bg-[#070b14] px-6 py-10 text-slate-100"><div className="mx-auto max-w-3xl"><button onClick={()=>nav({to:"/campaigns"})} className="text-sm text-slate-500">← Campanhas</button><h1 className="mt-6 text-4xl font-bold">Nova campanha</h1><GlassCard className="mt-8 p-6"><form onSubmit={async e=>{e.preventDefault();try{const c=await createCampaign(name,description);nav({to:"/campaigns/$id",params:{id:c[0].id}})}catch(x){setError(x instanceof Error?x.message:"Erro")}}} className="space-y-4"><input required value={name} onChange={e=>setName(e.target.value)} placeholder="Nome da campanha" className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3"/><textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="Descrição" rows={5} className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3"/>{error&&<p className="text-sm text-red-300">{error}</p>}<NeonButton type="submit">Criar campanha</NeonButton></form></GlassCard></div></main>}
