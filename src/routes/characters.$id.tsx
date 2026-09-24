@@ -1,0 +1,7 @@
+import {useEffect,useState} from "react";
+import {createFileRoute,useNavigate} from "@tanstack/react-router";
+import {GlassCard} from "@/features/core/ui/GlassCard";
+import {CharacterForm} from "@/features/characters/CharacterForm";
+import {listCharacters,updateCharacter,type Character} from "@/features/characters/api";
+export const Route=createFileRoute("/characters/$id")({component:CharacterEditor});
+function CharacterEditor(){const {id}=Route.useParams();const nav=useNavigate();const [character,setCharacter]=useState<Character|null>(null);const [error,setError]=useState("");useEffect(()=>{listCharacters().then(xs=>setCharacter(xs.find(x=>x.id===id)||null)).catch(e=>setError(e instanceof Error?e.message:"Erro ao carregar."))},[id]);if(error)return <main className="min-h-screen bg-[#070b14] p-10 text-red-300">{error}</main>;if(!character)return <main className="min-h-screen bg-[#070b14] p-10 text-slate-500">Carregando ficha...</main>;return <main className="min-h-screen bg-[#070b14] px-6 py-10 text-slate-100"><div className="mx-auto max-w-4xl"><button onClick={()=>nav({to:"/characters"})} className="text-sm text-slate-500 hover:text-white">← Personagens</button><h1 className="mt-6 text-4xl font-bold">{character.name}</h1><GlassCard className="mt-8 p-6 md:p-8"><CharacterForm initial={character} submitLabel="Salvar alterações" onSubmit={async data=>{await updateCharacter(id,data);nav({to:"/characters"})}}/></GlassCard></div></main>}
