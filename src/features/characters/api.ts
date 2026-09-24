@@ -1,7 +1,7 @@
 import {supabaseFetch} from "@/lib/supabase";
 import type {CharacterInput} from "./data";
 import {getSession} from "@/lib/session";
-export type Character={id:string;owner_id:string;created_at:string;updated_at:string}&CharacterInput;
+export type Character={id:string;owner_id:string;created_at:string;updated_at:string}&CharacterInput&{skills?:unknown[];inventory?:unknown[];weapons?:unknown[];conditions?:string[]};
 const token=()=>getSession()?.access_token;
 export function listCharacters(){return supabaseFetch("characters?select=*&order=updated_at.desc",{},token()) as Promise<Character[]>}
 export function createCharacter(input:CharacterInput){return supabaseFetch("characters",{method:"POST",headers:{Prefer:"return=representation"},body:JSON.stringify(input)},token()) as Promise<Character[]>}
