@@ -83,3 +83,7 @@ create policy "session logs gm" on public.session_logs for all using (
 ) with check (
   exists (select 1 from public.campaigns c where c.id = session_logs.campaign_id and c.owner_id = auth.uid())
 );
+alter table public.characters add column if not exists skills jsonb not null default '[]'::jsonb;
+alter table public.characters add column if not exists inventory jsonb not null default '[]'::jsonb;
+alter table public.characters add column if not exists weapons jsonb not null default '[]'::jsonb;
+alter table public.characters add column if not exists conditions jsonb not null default '[]'::jsonb;
