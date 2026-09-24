@@ -89,3 +89,62 @@ alter table public.characters add column if not exists weapons jsonb not null de
 alter table public.characters add column if not exists conditions jsonb not null default '[]'::jsonb;
 
 create policy "session logs insert" on public.session_logs for insert with check (exists (select 1 from public.campaigns c where c.id=campaign_id and c.owner_id=auth.uid()));
+create table if not exists public.campaign_documents (
+  id uuid primary key default gen_random_uuid(),
+  campaign_id uuid not null references public.campaigns(id) on delete cascade,
+  created_by uuid not null references auth.users(id) on delete cascade,
+  title text not null,
+  type text not null check (type in ('Nota','Handout','NPC')),
+  content text not null default '',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.campaign_documents enable row level security;
+
+create policy "campaign documents members read" on public.campaign_documents
+for select using (
+  exists (
+    select 1 from public.campaign_members m
+    where m.campaign_id = campaign_documents.campaign_id
+    and m.user_id = auth.uid()
+  )
+  or exists (
+    select 1 from public.campaigns c
+    where c.id = campaign_documents.campaign_id
+    and c.owner_id = auth.uid()
+  )
+);
+
+create policy "campaign documents gm insert" on public.campaign_documents
+for insert with check (
+  exists (
+    select 1 from public.campaigns c
+    where c.id = campaign_documents.campaign_id
+    and c.owner_id = auth.uid()
+  )
+);
+
+create policy "campaign documents gm update" on public.campaign_documents
+for update using (
+  exists (
+    select 1 from public.campaigns c
+    where c.id = campaign_documents.campaign_id
+    and c.owner_id = auth.uid()
+  )
+) with check (
+  exists (
+    select 1 from public.campaigns c
+    where c.id = campaign_documents.campaign_id
+    and c.owner_id = auth.uid()
+  )
+);
+
+create policy "campaign documents gm delete" on public.campaign_documents
+for delete using (
+  exists (
+    select 1 from public.campaigns c
+    where c.id = campaign_documents.campaign_id
+    and c.owner_id = auth.uid()
+  )
+);
