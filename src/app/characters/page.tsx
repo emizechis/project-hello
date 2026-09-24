@@ -1,0 +1,7 @@
+import Link from "next/link";
+import { GridBackground } from "@/features/core/ui/GridBackground";
+import { Navbar } from "@/features/core/ui/Navbar";
+import { GlassCard } from "@/features/core/ui/GlassCard";
+import { NeonButton } from "@/features/core/ui/NeonButton";
+
+export default function CharactersPage(){return <main className="min-h-screen text-slate-100"><GridBackground/><Navbar/><section className="mx-auto max-w-7xl px-6 py-12"><div className="flex flex-wrap items-end justify-between gap-5"><div><p className="text-xs uppercase tracking-[.3em] text-sky-300">NEXUS / CHARACTERS</p><h1 className="mt-3 text-4xl font-bold">Your agents</h1><p className="mt-2 text-slate-400">Create and manage your characters.</p></div><Link href="/characters/new"><NeonButton>+ New character</NeonButton></Link></div><GlassCard className="mt-10 flex min-h-80 items-center justify-center p-8"><div className="text-center"><div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-sky-400/20 bg-sky-400/5 text-2xl text-sky-300">+</div><h2 className="mt-5 text-xl font-semibold">No agents yet</h2><p className="mt-2 text-sm text-slate-500">Your created characters will appear here.</p><Link href="/characters/new" className="mt-6 inline-block text-sm text-sky-300 hover:text-sky-200">Create your first agent →</Link></div></GlassCard></section></main>}
